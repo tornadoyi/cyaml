@@ -22,17 +22,6 @@ IF (CMAKE_BUILD_TYPE STREQUAL Debug)
 ENDIF()
 
 
-# options
-add_compile_options(-fPIC)
-
-# headers
-include_directories(
-  ${cybertron_INCLUDE_DIR}
-  ${yaml_INCLUDE_DIR} 
-)
-
-# print
-message(STATUS "SOURCES: ${SOURCES}")
-
-# target
-add_library(cyaml SHARED ${SOURCES})
+# add targets
+add_subdirectory(cyaml)
+add_subdirectory(test)

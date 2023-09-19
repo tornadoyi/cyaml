@@ -5,23 +5,23 @@
  * Get the library version.
  */
 
-YAML_DECLARE(const char *)
-yaml_get_version_string(void)
-{
-    return YAML_VERSION_STRING;
-}
+// YAML_DECLARE(const char *)
+// yaml_get_version_string(void)
+// {
+//     return YAML_VERSION_STRING;
+// }
 
 /*
  * Get the library version numbers.
  */
 
-YAML_DECLARE(void)
-yaml_get_version(int *major, int *minor, int *patch)
-{
-    *major = YAML_VERSION_MAJOR;
-    *minor = YAML_VERSION_MINOR;
-    *patch = YAML_VERSION_PATCH;
-}
+// YAML_DECLARE(void)
+// yaml_get_version(int *major, int *minor, int *patch)
+// {
+//     *major = YAML_VERSION_MAJOR;
+//     *minor = YAML_VERSION_MINOR;
+//     *patch = YAML_VERSION_PATCH;
+// }
 
 /*
  * Allocate a dynamic memory block.
