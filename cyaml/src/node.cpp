@@ -63,6 +63,7 @@ void Node::reset(yaml_document_s* d, yaml_node_s* n) {
         }
         if(yaml_node_t* val_n = yaml_document_get_node(d, i_p->value)) {
           mapping_[key] = new Node(d, val_n);
+          keys_.push_back(key);
         } else {
           throw cyaml_error("missing value for mapping node");
         }
@@ -75,19 +76,19 @@ void Node::reset(yaml_document_s* d, yaml_node_s* n) {
 }
 
 
-Node& Node::operator[](size_t index)  {
+const Node& Node::operator[](size_t index)  {
   ASSERT_TYPE(sequence);
   if(index >= sequence_.size()) {
-    throw cyaml_error("out of range, index: " + std::to_string(index));
+    return empty_node;
   }
   return *sequence_[index];
 }
 
-Node& Node::operator[](const std::string& key) {
+const Node& Node::operator[](const std::string& key) {
   ASSERT_TYPE(mapping);
   auto it = mapping_.find(key);
   if(it == mapping_.end()) {
-    throw cyaml_error("key error, key: " + key);
+    return empty_node;
   }
   return *it->second;
 }

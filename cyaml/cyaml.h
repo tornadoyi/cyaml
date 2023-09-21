@@ -31,6 +31,13 @@ struct Node {
 
     _Iterator(const MapIterator& m_it) { is_seq_ = false; m_it_ = m_it; }
 
+    _Iterator(const _Iterator& other) 
+    : is_seq_(other.is_seq_) 
+    , v_it_(other.v_it_)
+    , m_it_(other.m_it_) {
+    }
+
+
     const T& operator*() {
       if(!is_seq_) { throw cyaml_error("only sequnence iterator can call *"); }
       return *(*v_it_);
@@ -42,24 +49,24 @@ struct Node {
     }
 
     Self& operator++() {
-      if(is_seq_) { v_it_++; } else { m_it_++; }
+      if(is_seq_) { ++v_it_; } else { ++m_it_; }
       return *this;
     }
 
     Self operator++(int) {
       Self tmp(*this);
-      ++tmp;
+      ++(*this);
       return tmp;
     }
 
     Self& operator--() {
-      if(is_seq_) { v_it_--; } else { m_it_--; }
+      if(is_seq_) { --v_it_; } else { --m_it_; }
       return *this;
     }
 
     Self operator--(int) {
       Self tmp(*this);
-      --tmp;
+      --(*this);
       return tmp;
     }
 
@@ -107,9 +114,9 @@ struct Node {
 
   bool is_mapping() const { return type_ == Type::Mapping; }
 
-  Node& operator[](size_t index) ;
+  const Node& operator[](size_t index) ;
 
-  Node& operator[](const std::string& key) ;
+  const Node& operator[](const std::string& key) ;
 
   const Node& operator[](size_t index) const;
 
