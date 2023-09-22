@@ -114,19 +114,19 @@ size_t Node::size() const {
   switch (type_) {
   case Type::Sequence: { return sequence_.size(); }
   case Type::Mapping: { return mapping_.size(); }
-  case Type::Empty:
+  case Type::Empty: { return 0; }
   case Type::Scalar:
   default:
-    throw cyaml_error("node type is" + std::to_string(int(type_)) + " expected: sequence, mapping");
+    throw cyaml_error("node type is " + std::to_string(int(type_)) + " expected: sequence or mapping");
   }
-  throw cyaml_error("node type is" + std::to_string(int(type_)) + " expected: sequence, mapping");
+  throw cyaml_error("node type is " + std::to_string(int(type_)) + " expected: sequence or mapping");
 }
 
 Node::iterator Node::begin() {
   switch (type_) {
   case Type::Sequence: { return iterator(sequence_.begin()); }
   case Type::Mapping: { return iterator(mapping_.begin()); }
-  case Type::Empty:
+  case Type::Empty: { return iterator(); }
   case Type::Scalar:
   default:
     throw cyaml_error("node type is" + std::to_string(int(type_)) + " expected: sequence, mapping");
@@ -138,7 +138,7 @@ Node::const_iterator Node::begin() const {
   switch (type_) {
   case Type::Sequence: { return const_iterator(sequence_.begin()); }
   case Type::Mapping: { return const_iterator(mapping_.begin()); }
-  case Type::Empty:
+  case Type::Empty: { return const_iterator(); }
   case Type::Scalar:
   default:
     throw cyaml_error("node type is" + std::to_string(int(type_)) + " expected: sequence, mapping");
@@ -150,7 +150,7 @@ Node::iterator Node::end() {
   switch (type_) {
   case Type::Sequence: { return iterator(sequence_.end()); }
   case Type::Mapping: { return iterator(mapping_.end()); }
-  case Type::Empty:
+  case Type::Empty: { return iterator(); }
   case Type::Scalar:
   default:
     throw cyaml_error("node type is" + std::to_string(int(type_)) + " expected: sequence, mapping");
@@ -162,7 +162,7 @@ Node::const_iterator Node::end() const {
   switch (type_) {
   case Type::Sequence: { return const_iterator(sequence_.end()); }
   case Type::Mapping: { return const_iterator(mapping_.end()); }
-  case Type::Empty:
+  case Type::Empty: { return const_iterator(); }
   case Type::Scalar:
   default:
     throw cyaml_error("node type is" + std::to_string(int(type_)) + " expected: sequence, mapping");

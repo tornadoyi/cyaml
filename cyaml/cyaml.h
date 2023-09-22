@@ -25,31 +25,50 @@ struct Node {
   template<class T, typename VectorIterator, typename MapIterator>
   struct _Iterator {
    public:
+    enum class Type { Empty = 0, Sequence, Mapping };
+
     typedef _Iterator<T, VectorIterator, MapIterator> Self;
 
-    _Iterator(const VectorIterator& v_it) { is_seq_ = true; v_it_ = v_it; }
+    _Iterator() { type_ = Type::Empty; }
 
-    _Iterator(const MapIterator& m_it) { is_seq_ = false; m_it_ = m_it; }
+    _Iterator(const VectorIterator& v_it) { type_ = Type::Sequence; v_it_ = v_it; }
+
+    _Iterator(const MapIterator& m_it) { type_ = Type::Mapping; m_it_ = m_it; }
 
     _Iterator(const _Iterator& other) 
-    : is_seq_(other.is_seq_) 
+    : type_(other.type_) 
     , v_it_(other.v_it_)
     , m_it_(other.m_it_) {
     }
 
-
     const T& operator*() {
-      if(!is_seq_) { throw cyaml_error("only sequnence iterator can call *"); }
-      return *(*v_it_);
+      switch(type_) {
+        case Type::Empty: { throw cyaml_error("sequence iterator only function *, current empty"); }
+        case Type::Sequence: { return *(*v_it_); }
+        case Type::Mapping: { throw cyaml_error("sequence iterator only function *, current mapping"); }
+        default:
+          throw cyaml_error("invalid iterator type " + std::to_string(int(type_)));
+      }
     }
 
     MapIterator operator->(){
-      if(is_seq_) { throw cyaml_error("only mapping iterator can call *"); }
-      return m_it_;
+      switch(type_) {
+        case Type::Empty: { throw cyaml_error("mapping iterator only function ->, current empty"); }
+        case Type::Sequence: { throw cyaml_error("mapping iterator only function ->, current sequence"); }
+        case Type::Mapping: { return m_it_; }
+        default:
+          throw cyaml_error("invalid iterator type " + std::to_string(int(type_)));
+      }
     }
 
     Self& operator++() {
-      if(is_seq_) { ++v_it_; } else { ++m_it_; }
+      switch(type_) {
+        case Type::Empty: { throw cyaml_error("sequence or mapping iterator only function ->, current empty"); }
+        case Type::Sequence: { ++v_it_; break; }
+        case Type::Mapping: { ++m_it_; break; }
+        default:
+          throw cyaml_error("invalid iterator type " + std::to_string(int(type_)));
+      }
       return *this;
     }
 
@@ -60,7 +79,13 @@ struct Node {
     }
 
     Self& operator--() {
-      if(is_seq_) { --v_it_; } else { --m_it_; }
+      switch(type_) {
+        case Type::Empty: { throw cyaml_error("sequence or mapping iterator only function ->, current empty"); }
+        case Type::Sequence: { --v_it_; break; }
+        case Type::Mapping: { --m_it_; break; }
+        default:
+          throw cyaml_error("invalid iterator type " + std::to_string(int(type_)));
+      }
       return *this;
     }
 
@@ -71,21 +96,27 @@ struct Node {
     }
 
     bool operator==(const _Iterator& other) {
-      return is_seq_ ? v_it_ == other.v_it_ : m_it_ == other.m_it_;
+      switch(type_) {
+        case Type::Empty: { return other.type_ == Type::Empty; }
+        case Type::Sequence: { return v_it_ == other.v_it_; }
+        case Type::Mapping: { return m_it_ == other.m_it_; }
+        default:
+          throw cyaml_error("invalid iterator type " + std::to_string(int(type_)));
+      }
     }
 
     bool operator!=(const _Iterator& other) {
       return !operator==(other);
     }
     Self operator=(const _Iterator& other) {
-      is_seq_ = other.is_seq_;
+      type_ = other.type_;
       v_it_ = other.v_it_;
       m_it_ = other.m_it_;
       return *this;
     }
 
    protected:
-    bool is_seq_;
+    Type type_;
     VectorIterator v_it_;
     MapIterator m_it_;
   };
@@ -102,9 +133,15 @@ struct Node {
 
   ~Node() { reset(nullptr, nullptr); }
 
+  Node(const Node&) = delete;
+
+  Node &operator = (const Node&) = delete;
+
   void reset(yaml_document_s* d, yaml_node_s* n);
 
   Type type() const { return type_; }
+
+  bool defined() const { return type_ != Type::Empty; }
 
   bool empty() const { return type_ == Type::Empty; }
 
@@ -160,9 +197,13 @@ struct Document {
   };
   
 
-  Document() : root_(nullptr) {}
+  Document();
 
-  ~Document() { delete(root_); root_ = nullptr; }
+  ~Document();
+
+  Document(const Document&) = delete;
+
+  Document &operator = (const Document&) = delete;
 
   ParsedResult parse(const std::string& input);
 

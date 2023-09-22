@@ -5,6 +5,17 @@
 
 namespace cyaml {
 
+Document::Document()
+: root_(nullptr) {
+  
+}
+
+Document::~Document() {
+  if(root_) {
+    delete(root_);
+    root_ = nullptr;
+  }
+}
 
 Document::ParsedResult Document::parse(const std::string& input) {
   // initialize
